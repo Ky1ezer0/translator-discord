@@ -10,7 +10,7 @@ class MyClient(discord.Client):
         await self.change_presence(
             activity=discord.Activity(type=discord.ActivityType.watching, name="Namin")
         )
-        self.translate_channel_id = 990973759940878337
+        self.translate_channel_id = 977017340065620048
         self.admin_id = config.my_dc_id
         print("Logged on as", self.user)
 
