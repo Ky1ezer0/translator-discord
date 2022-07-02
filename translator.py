@@ -19,41 +19,45 @@ class MyClient(discord.Client):
         if message.author == self.user:
             return
         # yourself and the dc owner can set channel
-
-        match message.content:
-            case "!set":
-                if (
-                    message.author.id == self.admin_id
-                    or message.author.guild_permissions.administrator
-                ):
-                    self.translate_channel_id = message.channel.id
-                    await message.channel.send(
-                        f"This channel has been enabled translation"
-                    )
-            case "!check":
-                if (
-                    message.author.id == self.admin_id
-                    or message.author.guild_permissions.administrator
-                ):
-                    channel = await self.fetch_channel(self.translate_channel_id)
-                    await message.channel.send(
-                        f"Currently target channel is: {channel.name} in {channel.guild.name}"
-                    )
-            case _:
-                if (
-                    message.channel.id == self.translate_channel_id
-                    and message.author.bot == False
-                ):
-                    translated_text = await self.translate(message)
-                    if translated_text != message.content and translated_text != None:
-                        if message.author.nick == None:
-                            await message.channel.send(
-                                f"**{message.author.name}** : {translated_text}"
-                            )
-                        else:
-                            await message.channel.send(
-                                f"**{message.author.nick}** : {translated_text}"
-                            )
+        if len(message.content > 0):
+            match message.content:
+                case "!set":
+                    if (
+                        message.author.id == self.admin_id
+                        or message.author.guild_permissions.administrator
+                    ):
+                        self.translate_channel_id = message.channel.id
+                        await message.channel.send(
+                            f"This channel has been enabled translation"
+                        )
+                case "!check":
+                    if (
+                        message.author.id == self.admin_id
+                        or message.author.guild_permissions.administrator
+                    ):
+                        channel = await self.fetch_channel(self.translate_channel_id)
+                        await message.channel.send(
+                            f"Currently target channel is: {channel.name} in {channel.guild.name}"
+                        )
+                case _:
+                    if (
+                        message.content[0] != "!"
+                        and message.channel.id == self.translate_channel_id
+                        and message.author.bot == False
+                    ):
+                        translated_text = await self.translate(message)
+                        if (
+                            translated_text != message.content
+                            and translated_text != None
+                        ):
+                            if message.author.nick == None:
+                                await message.channel.send(
+                                    f"**`{message.author.name}`** : {translated_text}"
+                                )
+                            else:
+                                await message.channel.send(
+                                    f"**`{message.author.nick}`*`* : {translated_text}"
+                                )
 
     async def on_message_edit(self, before_msg, after_msg):
         if before_msg.channel.id == self.translate_channel_id:
@@ -62,11 +66,11 @@ class MyClient(discord.Client):
                 translated_text = await self.translate(after_msg)
                 if after_msg.author.nick == None:
                     await after_msg.channel.send(
-                        f"**{after_msg.author.name}** : {translated_text}"
+                        f"**`{after_msg.author.name}`** : {translated_text}"
                     )
                 else:
                     await after_msg.channel.send(
-                        f"**{after_msg.author.nick}** : {translated_text}"
+                        f"**`{after_msg.author.nick}`** : {translated_text}"
                     )
 
     async def translate(self, message):
